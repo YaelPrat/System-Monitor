@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Active Processes</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+.navbar {
+    width: 100%;
+    background-color: #333;
+    overflow: auto;
+
+}
+
+.navbar a {
+    float: left;
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+.navbar a:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+.navbar a.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.navbar a.logout {
+    float: right;
+}
+
+    </style>
+</head>
+<body>
+<div class="navbar">
+    <a href="/charts">Main Dashboard</a>
+    <a href="{{ url_for('active_processes') }}">Active Processes</a>
+</div>
+    <h1>Active Processes</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>
+                    <select id="userFilter">
+                        <option value="">All Users</option>
+                            {% for username in usernames %}
+                                {% if username != "USER" %}
+                                    <option value="{{ username }}">{{ username }}</option>
+                                    {% endif %}
+                            {% endfor %}
+                    </select></th>
+                <th>PID</th>
+                <th>%CPU</th>
+                <th>%MEM</th>
+                <th>VSZ</th>
+                <th>RSS</th>
+                <th>TTY</th>
+                <th>STAT</th>
+                <th>START</th>
+                <th>TIME</th>
+                <th>COMMAND</th>
+            </tr>
+        </thead>
+     <tbody id="processesTableBody">
+    {% for process in processes[1:]%}
+    <tr>
+        <td>{{ process[0] }}</td>
+        <td>{{ process[1] }}</td>
+        <td>{{ process[2] }}</td>
+        <td>{{ process[3] }}</td>
+        <td>{{ process[4] }}</td>
+        <td>{{ process[5] }}</td>
+        <td>{{ process[6] }}</td>
+        <td>{{ process[7] }}</td>
+        <td>{{ process[8] }}</td>
+        <td>{{ process[9] }}</td>
+        <td>{{ process[10] }}</td>
+    </tr>
+    {% endfor %}
+</tbody>
+
+    </table>
+
+<script>
+    var userFilterDropdown = document.getElementById('userFilter');
+    userFilterDropdown.addEventListener('change', function () {
+        var selectedUsername = userFilterDropdown.value;
+        console.log("Selected username:", selectedUsername); // Check if the function is triggered
+        updateFilteredProcesses(selectedUsername);
+    });
+
+function updateFilteredProcesses(username) {
+    $.get('/filtered_processes', { username: username }, function (data) {
+        var tableBody = document.getElementById('processesTableBody');
+        tableBody.innerHTML = ''; // Clear previous data
+
+        data.forEach(function (process) {
+            // Check if the number of cells in the row exceeds the number of columns
+            if (process.length <= 11) { // Assuming 11 is the number of columns in your table
+                var row = document.createElement('tr');
+                process.forEach(function (cell) {
+                    var cellElement = document.createElement('td');
+                    cellElement.textContent = cell;
+                    row.appendChild(cellElement);
+                });
+                tableBody.appendChild(row);
+            }
+        });
+    }).fail(function (xhr, textStatus, errorThrown) {
+        console.error("Failed to fetch filtered processes:", errorThrown);
+    });
+}
+
+</script>
+</body>
+</html>

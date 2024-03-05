@@ -195,5 +195,54 @@ def get_data(ip):
     return cpu_output.strip(), mem_output.strip(), ram_output.strip()
 
 
+def get_active_processes():
+    try:
+        # Execute command to get active processes
+        stdin, stdout, stderr = ssh_client.exec_command('ps aux')
+        output = stdout.read().decode('utf-8')
+
+        # Process the output to extract relevant information
+        active_processes = [line.split() for line in output.splitlines()]
+        usernames = set(process[0] for process in active_processes)
+
+        return active_processes, usernames
+    except Exception as e:
+        return []
+
+
+@app.route('/active_processes')
+def active_processes():
+    processes, usernames = get_active_processes()
+    return render_template('active_processes.html', processes=processes, usernames=usernames)
+
+
+@app.route('/filtered_processes', methods=['GET'])
+def filtered_processes():
+    # Get the selected username from the request query string
+    selected_username = request.args.get('username')
+    print(selected_username)
+    try:
+        # Execute command to get active processes
+        stdin, stdout, stderr = ssh_client.exec_command('ps aux')
+        output = stdout.read().decode('utf-8')
+
+        # Process the output to extract relevant information
+        active_processes = [line.split() for line in output.splitlines()]
+    except Exception as e:
+        # Handle exceptions gracefully
+        app.logger.error(f"Failed to fetch active processes: {str(e)}")
+        return jsonify({'error': 'Failed to fetch active processes'}), 500
+
+    if selected_username:
+        # Filter active processes based on the selected username
+        filtered_processes = [process for process in active_processes if process[0] == selected_username]
+        print(filtered_processes)
+    else:
+        # If no username is selected, return all active processes
+        filtered_processes = active_processes
+
+    # Return the filtered processes as JSON
+    return jsonify(filtered_processes)
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5006, debug=True)
