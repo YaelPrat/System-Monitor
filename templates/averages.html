@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>Averages Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        header {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+        .average-container {
+            display: flex;
+            justify-content: space-around;
+        }
+        .average-box {
+            flex: 1;
+            text-align: center;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        Averages Dashboard
+    </header>
+
+    <label for="datePicker">Choose a Date:</label>
+    <input type="date" id="datePicker">
+
+    <div class="average-container">
+        <div class="average-box" id="cpuAverage">
+            <h3>CPU Average</h3>
+            <p id="cpuValue">---</p>
+        </div>
+
+        <div class="average-box" id="ramAverage">
+            <h3>RAM Average</h3>
+            <p id="ramValue">---</p>
+        </div>
+
+        <div class="average-box" id="diskAverage">
+            <h3>Disk Average</h3>
+            <p id="diskValue">---</p>
+        </div>
+    </div>
+
+    <script>
+        // Your JavaScript logic for updating averages based on the selected date will go here
+        // For now, the values are set to '---' as placeholders
+       document.getElementById('datePicker').addEventListener('change', function () {
+    // Get the selected date from the date picker
+    var selectedDate = document.getElementById('datePicker').value;
+
+    // Replace this with logic to fetch and update averages based on the selected date
+    $.get('/getAvgs', { date: selectedDate }, function(data) {
+        document.getElementById('cpuValue').innerText = data.cpu;
+        document.getElementById('ramValue').innerText = data.ram;
+        document.getElementById('diskValue').innerText = data.disk;
+    });
+});
+    </script>
+
+</body>
+</html>

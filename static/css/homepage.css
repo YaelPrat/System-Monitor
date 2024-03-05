@@ -1,0 +1,66 @@
+body {
+    padding: 20px;
+    background-color : aliceblue;
+}
+#header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+#inputContainer {
+    text-align: center;
+    margin-left: 30%;
+    margin-right: 30%;
+}
+#addressInput {
+    width: 100%;
+    margin-bottom: 10px;
+}
+#startButton {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    font-size: 30px;
+}
+.error{
+    color:red;
+    border-radius: 5px;
+    border-style: dotted;
+}
+
+/* Style for the table */
+#metricsTable {
+    width: 100%;
+    border-radius: 5px;
+    border-style: dotted;
+}
+
+/*.scrollbox{
+    width: 100%;
+    height: 20px;
+    overflow-y: auto;
+    border-radius: 5px;
+    border-style: dotted;
+}
+*/
+
+
+.tableFixHead {
+        overflow-y: auto; /* make the table scrollable if height is more than 200 px  */
+        height: 200px; /* gives an initial height of 200px to the table */
+      }
+      .tableFixHead thead th {
+        position: sticky; /* make the table heads sticky */
+        top: 0px; /* table head will be placed from the top of the table and sticks to it */
+      }
+      table {
+        border-collapse: collapse; /* make the table borders collapse to each other */
+        width: 100%;
+      }
+      th,
+      td {
+        padding: 8px 16px;
+        border: 1px solid #ccc;
+      }
+      th {
+        background: #eee;
+      }

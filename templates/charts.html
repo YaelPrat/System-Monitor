@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Monitor</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: space-between;
+            height: 100vh;
+            margin: 0;
+            align-items: flex-start;
+        }
+
+        #charts-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 50%;
+            margin-top: 50px;
+        }
+
+        canvas {
+            margin-bottom: 20px;
+            max-height: 200px;
+        }
+
+        #right-container {
+            width: 50%;
+            padding: 20px;
+            box-sizing: border-box;
+            margin-top: 50px;
+        }
+        header {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+        .average-container {
+            display: flex;
+            justify-content: space-around;
+        }
+        .average-box {
+            flex: 1;
+            text-align: center;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+.tableFixHead {
+        overflow-y: auto;
+        height: 350px;
+      }
+      .tableFixHead thead th {
+        position: sticky;
+        top: 0px;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      th,
+      td {
+        padding: 8px 16px;
+        border: 1px solid #ccc;
+      }
+      th {
+        background: #eee;
+      }
+    </style>
+</head>
+<body>
+    <div id="charts-container">
+        <h1>System Metrics</h1>
+        <canvas id="cpu-chart" width="400" height="200"></canvas>
+        <canvas id="memory-chart" width="400" height="200"></canvas>
+        <canvas id="disk-chart" width="400" height="200"></canvas>
+    </div>
+
+    <div id="right-container">
+        <header>
+            Averages Dashboard
+        </header>
+
+    <label for="datePicker">Choose a Date:</label>
+    <input type="date" id="datePicker">
+
+    <div class="average-container">
+        <div class="average-box" id="cpuAverage">
+            <h3>CPU Average</h3>
+            <p id="cpuValue">---</p>
+        </div>
+
+        <div class="average-box" id="ramAverage">
+            <h3>RAM Average</h3>
+            <p id="ramValue">---</p>
+        </div>
+
+        <div class="average-box" id="diskAverage">
+            <h3>Disk Average</h3>
+            <p id="diskValue">---</p>
+
+        </div>
+
+
+    </div>
+
+<div>
+        <br>
+          <header>
+            Abnormal Results Dashboard
+        </header>
+    <div class="average-container tableFixHead">
+    <table id="metricsTable" class="scrollbox">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>
+                    <select id="typeFilter">
+                    <option value="CPU">CPU</option>
+                    <option value="RAM">RAM</option>
+                    <option value="DISK">DISK</option>
+
+                    </select>
+                </th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+</div>
+
+
+    <script>
+        document.getElementById('datePicker').addEventListener('change', function () {
+        var selectedDate = document.getElementById('datePicker').value;
+    $.get('/getAvgs', { date: selectedDate }, function(data) {
+        document.getElementById('cpuValue').innerText = data.cpu;
+        document.getElementById('ramValue').innerText = data.ram;
+        document.getElementById('diskValue').innerText = data.disk;
+    });
+});
+    </script>
+    </div>
+
+    <script>
+        var cpuData = {
+            labels: [],
+            datasets: [{
+                label: 'CPU Usage',
+                data: [],
+                backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        };
+
+        var memoryData = {
+            labels: [],
+            datasets: [{
+                label: 'RAM Usage',
+                data: [],
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        };
+
+        var diskData = {
+            labels: [],
+            datasets: [{
+                label: 'Disk Usage',
+                data: [],
+                backgroundColor: 'rgba(54, 12, 25, 0.5)',
+                borderColor: 'rgba(54, 12, 25, 1)',
+                borderWidth: 1
+            }]
+        };
+
+        var cpuCtx = document.getElementById('cpu-chart').getContext('2d');
+        var memoryCtx = document.getElementById('memory-chart').getContext('2d');
+        var diskCtx = document.getElementById('disk-chart').getContext('2d');
+
+        var cpuChart = new Chart(cpuCtx, {
+            type: 'line',
+            data: cpuData,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        var memoryChart = new Chart(memoryCtx, {
+            type: 'line',
+            data: memoryData,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        var diskChart = new Chart(diskCtx, {
+            type: 'line',
+            data: diskData,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+   function formatSamples(samples) {
+        var result = "";
+        samples.forEach(function(sample) {
+            result += "<tr>";
+            result += "<td>" + new Date(sample.date).toLocaleDateString() + "</td>";
+            result += "<td>" + sample.type + "</td>";
+            result += "<td>" + sample.value.toFixed(2) + "</td>";
+            result += "</tr>";
+        });
+        return result; // Return the formatted HTML string
+    }
+
+function updateCharts() {
+    $.get('/system_metrics', function(data) {
+        // Update CPU chart
+        cpuData.labels.push(new Date().toLocaleTimeString());
+        cpuData.datasets[0].data.push(data.cpu_percent);
+        if (cpuData.labels.length > 50) {
+            cpuData.labels.shift();
+            cpuData.datasets[0].data.shift();
+        }
+        cpuChart.update();
+
+        // Update memory chart
+        memoryData.labels.push(new Date().toLocaleTimeString());
+        memoryData.datasets[0].data.push(data.memory_percent);
+        if (memoryData.labels.length > 50) {
+            memoryData.labels.shift();
+            memoryData.datasets[0].data.shift();
+        }
+        memoryChart.update();
+
+        // Update memory chart
+        diskData.labels.push(new Date().toLocaleTimeString());
+        diskData.datasets[0].data.push(data.disk_percent);
+        if (diskData.labels.length > 50) {
+            diskData.labels.shift();
+            diskData.datasets[0].data.shift();
+        }
+        diskChart.update();
+    });
+}
+var select = document.getElementById("typeFilter");
+select.addEventListener("change", function() {
+    var selectedType =  document.getElementById('typeFilter').value;
+    updateAbnormal(selectedType)
+    });
+
+function updateAbnormal(arg) {
+    $.get('/abnormal', { arg: arg }, function(data) {
+        //alert("Abnormal data:", data);
+        var samplesHtml = formatSamples(data.samples);
+        $('#metricsTable tbody').html(samplesHtml);
+    }).fail(function(xhr, textStatus, errorThrown) {
+        console.error("Failed to fetch abnormal data:", errorThrown);
+    });
+}
+
+setInterval(updateCharts, 2000);
+updateAbnormal('CPU')
+    </script>
+</body>
+</html>

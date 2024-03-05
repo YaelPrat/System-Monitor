@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Monitor</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha384-5bCTjBFxC1vKm0QvTUEiMIFzhsnsQt89m/BbGlBOfvqAcCqCkbSsw27pJU4tzJPv" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+            socket.on('connect', function() {
+                console.log('Connected');
+            });
+
+            socket.on('system_data', function(data) {
+                $('#cpu_percent').text(data.cpu_percent + '%');
+                $('#memory_percent').text(data.memory_percent + '%');
+                $('#disk_percent').text(data.disk_percent + '%');
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>System Metrics</h1>
+    <table border="1">
+        <tr>
+            <th>Metric</th>
+            <th>Value</th>
+        </tr>
+        <tr>
+            <td>CPU Usage</td>
+            <td id="cpu_percent"></td>
+        </tr>
+        <tr>
+            <td>Memory Usage</td>
+            <td id="memory_percent"></td>
+        </tr>
+        <tr>
+            <td>Disk Usage</td>
+            <td id="disk_percent"></td>
+        </tr>
+    </table>
+</body>
+</html>
